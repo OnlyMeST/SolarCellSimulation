@@ -22,4 +22,4 @@ http://localhost:8080/solar-energy/panels/timeRange?startTS=2024-01-24T11:36:42&
         }
     }
 
-    Invalid input format or an error occurred
+Argument [Wed Jan 24 11:36:42 CET 2024] of type [java.util.Date] did not match parameter type [java.time.LocalDateTime (n/a)]
