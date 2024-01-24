@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "solar_cell")
+@Table(name = "your_table")
 public class SolarEnergyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
