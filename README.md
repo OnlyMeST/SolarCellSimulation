@@ -1,40 +1,34 @@
 # SolarCellSimulation
 A Java Spring boot application that generates data to predict the energy win and loss of energy in a solar cell. The Data can be inserted into a postgreSQL database.
 
-List<SolarEnergyEntity> findByIdBetween(Integer startId, Integer endId);
-
-public List<SolarEnergyEntity> getPanelsByIdRange(Integer startId, Integer endId) {
-        return solarEnergyRepository.findByIdBetween(startId, endId);
-    }
-
 @SuppressWarnings("unchecked")
-@GetMapping("/panels/{id}")
-public ResponseEntity<?> getPanelById(@PathVariable String id) {
-    if (id.contains("-")) {
-        String[] range = id.split("-");
+@GetMapping("/panels/by-timestamp/{timestamp}")
+public ResponseEntity<?> getPanelsByTimestamp(@PathVariable String timestamp) {
+    if (timestamp.contains("-")) {
+        String[] range = timestamp.split("-");
         if (range.length == 2) {
             try {
-                int startId = Integer.parseInt(range[0]);
-                int endId = Integer.parseInt(range[1]);
-                List<SolarEnergyEntity> panelsInRange = panelService.getPanelsByIdRange(startId, endId);
+                LocalDateTime startTimestamp = LocalDateTime.parse(range[0] + "T00:00");
+                LocalDateTime endTimestamp = LocalDateTime.parse(range[1] + "T23:59");
+                List<SolarEnergyEntity> panelsInRange = panelService.getPanelsByTimestampRange(startTimestamp, endTimestamp);
                 return ResponseEntity.ok(panelsInRange);
-            } catch (NumberFormatException e) {
+            } catch (DateTimeParseException e) {
                 // Handle parsing error
-                return ResponseEntity.badRequest().body("Invalid range format");
+                return ResponseEntity.badRequest().body("Invalid timestamp range format");
             }
         }
     } else {
         try {
-            int singleId = Integer.parseInt(id);
-            SolarEnergyEntity panel = panelService.getPanelById(singleId);
-            if (panel != null) {
-                return ResponseEntity.ok(Collections.singletonList(panel));
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid ID format");
+            // Assuming partial timestamp (year, month, day)
+            LocalDateTime partialTimestamp = LocalDateTime.parse(timestamp + "T00:00");
+            List<SolarEnergyEntity> panelsByPartialTimestamp = panelService.getPanelsByPartialTimestamp(partialTimestamp);
+            return ResponseEntity.ok(panelsByPartialTimestamp);
+        } catch (DateTimeParseException e) {
+            // Handle parsing error
+            return ResponseEntity.badRequest().body("Invalid timestamp format");
         }
     }
+
+    // Handle invalid input format
     return ResponseEntity.badRequest().body("Invalid input format");
 }
