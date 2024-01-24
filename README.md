@@ -5,15 +5,20 @@ A Java Spring boot application that generates data to predict the energy win and
         return solarEnergyRepository.findByTimestampBetween(startTS, endTS);
     }
     
-public ResponseEntity<?> getByTimestamp(@PathVariable LocalDateTime timestamp) {
+@GetMapping("/getByTimestamp/{timestamp}")
+    public ResponseEntity<?> getByTimestamp(@PathVariable LocalDateTime timestamp) {
         try {
-        	List<SolarEnergyEntity> panel = panelService.getPanelsByTimestamp(timestamp);
-            if (panel != null) {
-                return ResponseEntity.ok(Collections.singletonList(panel));
+            // Modify this line to use getPanelsByTimestampRange method
+            List<SolarEnergyEntity> panels = panelService.getPanelsByTimestampRange(
+                    Date.from(timestamp.atZone(ZoneId.systemDefault()).toInstant()),
+                    Date.from(timestamp.plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant()) 
+            );
+            if (panels != null && !panels.isEmpty()) {
+                return ResponseEntity.ok(panels);
             } else {
-                return ResponseEntity.badRequest().body("Invalid ID format");
+                return ResponseEntity.badRequest().body("No panels found for the given timestamp range");
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Invalid input format");
+            return ResponseEntity.badRequest().body("Invalid input format or an error occurred");
         }
     }
