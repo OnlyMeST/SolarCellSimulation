@@ -1,3 +1,8 @@
 # SolarCellSimulation
 A Java Spring boot application that generates data to predict the energy win and loss of energy in a solar cell. The Data can be inserted into a postgreSQL database.
-Error creating bean with name 'solarCellController' defined in file [C:\Users\mostafa_saria\Downloads\solarcell\solarcell\target\classes\com\saria\solarcell\solarcomponents\SolarCellController.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'solarPanelService': Unsatisfied dependency expressed through field 'solarEnergyRepository': Error creating bean with name 'solarPanelRepository' defined in com.saria.solarcell.solarcomponents.SolarPanelRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Could not create query for public abstract java.util.List com.saria.solarcell.solarcomponents.SolarPanelRepository.findByTimestampContaining(java.time.LocalDateTime); Reason: Failed to create query for method public abstract java.util.List com.saria.solarcell.solarcomponents.SolarPanelRepository.findByTimestampContaining(java.time.LocalDateTime); Operand of 'like' is of type 'java.time.LocalDateTime' which is not a string (it is not an instance of 'java.lang.String' or 'char[]')
+Transactional(readOnly = true)
+    public List<SolarEnergyEntity> getPanelsByPartialTimestamp(LocalDateTime partialTimestamp) {
+        // Format the LocalDateTime to a string representation
+        String formattedPartialTimestamp = partialTimestamp.toString();
+        return solarEnergyRepository.findByTimestampContaining(formattedPartialTimestamp);
+    }
