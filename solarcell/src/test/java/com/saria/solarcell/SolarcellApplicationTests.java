@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,21 +27,43 @@ class SolarCellControllerTest {
     @Test
     void testGetPanelById() {
         // Arrange
-        int testPanelId = 1;
+        String testPanelId = "1";
         SolarEnergyEntity testPanelEntity = new SolarEnergyEntity();
-        testPanelEntity.setId(testPanelId);
 
         // Mock the behavior of the panelService
-        when(panelService.getPanelById(testPanelId)).thenReturn(Collections.singletonList(testPanelEntity));
+        when(panelService.getPanelById(anyInt())).thenReturn(Collections.singletonList(testPanelEntity));
 
         // Act
-        ResponseEntity<?> responseEntity = controller.getPanelById(String.valueOf(testPanelId));
+        ResponseEntity<?> responseEntity = controller.getPanelById(testPanelId);
 
         // Assert
         assertEquals(200, responseEntity.getStatusCodeValue());
 
         List<SolarEnergyEntity> responsePanels = (List<SolarEnergyEntity>) responseEntity.getBody();
         assertEquals(1, responsePanels.size());
-        assertEquals(testPanelId, responsePanels.get(0).getId());
+        assertEquals(testPanelEntity, responsePanels.get(0));
+    }
+
+    @Test
+    void testGetPanelByIdRange() {
+        // Arrange
+        String testPanelIdRange = "1-3";
+        SolarEnergyEntity panel1 = new SolarEnergyEntity();
+        SolarEnergyEntity panel2 = new SolarEnergyEntity();
+        SolarEnergyEntity panel3 = new SolarEnergyEntity();
+
+        when(panelService.getPanelsByIdRange(anyInt(), anyInt())).thenReturn(Arrays.asList(panel1, panel2, panel3));
+
+        // Act
+        ResponseEntity<?> responseEntity = controller.getPanelById(testPanelIdRange);
+
+        // Assert
+        assertEquals(200, responseEntity.getStatusCodeValue());
+
+        List<SolarEnergyEntity> responsePanels = (List<SolarEnergyEntity>) responseEntity.getBody();
+        assertEquals(3, responsePanels.size());
+        assertEquals(panel1, responsePanels.get(0));
+        assertEquals(panel2, responsePanels.get(1));
+        assertEquals(panel3, responsePanels.get(2));
     }
 }
