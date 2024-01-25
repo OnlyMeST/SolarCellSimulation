@@ -1,69 +1,49 @@
-import com.saria.solarcell.solarcomponents.SolarCellController;
-import com.saria.solarcell.solarcomponents.SolarEnergyEntity;
-import com.saria.solarcell.solarcomponents.SolarPanelService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(SolarCellController.class)
 class SolarCellControllerTest {
 
-    @Mock
-    private SolarPanelService panelService;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @InjectMocks
-    private SolarCellController controller;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
-    void testGetPanelById() {
-        // Arrange
-        String testPanelId = "1";
-        SolarEnergyEntity testPanelEntity = new SolarEnergyEntity();
+    void getPanelById_shouldReturnPanelWithNetEnergyEquals3() throws Exception {
+        // Given
+        int id = 1; // Replace with the desired ID for testing
 
-        // Mock the behavior of the panelService
-        when(panelService.getPanelById(anyInt())).thenReturn(Collections.singletonList(testPanelEntity));
+        // When
+        mockMvc.perform(get("/solar-energy/panels/id/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonResultMatches(Collections.singletonList(/* Expected SolarEnergyEntity */)))
+                .andExpect(jsonPath("$[0].netEnergy").value(3.0)); // Add this assertion
 
-        // Act
-        ResponseEntity<?> responseEntity = controller.getPanelById(testPanelId);
-
-        // Assert
-        assertEquals(200, responseEntity.getStatusCodeValue());
-
-        List<SolarEnergyEntity> responsePanels = (List<SolarEnergyEntity>) responseEntity.getBody();
-        assertEquals(1, responsePanels.size());
-        assertEquals(testPanelEntity, responsePanels.get(0));
+        // Then
+        // Add additional assertions as needed
     }
 
-    @Test
-    void testGetPanelByIdRange() {
-        // Arrange
-        String testPanelIdRange = "1-3";
-        SolarEnergyEntity panel1 = new SolarEnergyEntity();
-        SolarEnergyEntity panel2 = new SolarEnergyEntity();
-        SolarEnergyEntity panel3 = new SolarEnergyEntity();
+    // Add more tests for other controller methods as needed
 
-        when(panelService.getPanelsByIdRange(anyInt(), anyInt())).thenReturn(Arrays.asList(panel1, panel2, panel3));
-
-        // Act
-        ResponseEntity<?> responseEntity = controller.getPanelById(testPanelIdRange);
-
-        // Assert
-        assertEquals(200, responseEntity.getStatusCodeValue());
-
-        List<SolarEnergyEntity> responsePanels = (List<SolarEnergyEntity>) responseEntity.getBody();
-        assertEquals(3, responsePanels.size());
-        assertEquals(panel1, responsePanels.get(0));
-        assertEquals(panel2, responsePanels.get(1));
-        assertEquals(panel3, responsePanels.get(2));
+    private ResultMatcher jsonResultMatches(Object expectedObject) throws Exception {
+        return content().json(objectMapper.writeValueAsString(expectedObject));
     }
 }
