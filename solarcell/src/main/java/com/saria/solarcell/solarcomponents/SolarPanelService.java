@@ -72,4 +72,20 @@ public class SolarPanelService {
     public List<SolarEnergyEntity> getPanelsByNetEnergy(double netEnergy) {
         return solarEnergyRepository.findByNetEnergy(netEnergy);
     }
+    
+    @Transactional(readOnly = true)
+    public List<SolarEnergyEntity> getPanelById(Integer id){
+    	return solarEnergyRepository.findById(id);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<SolarEnergyEntity> getPanelsByIdRange(Integer startId, Integer endId) {
+        return solarEnergyRepository.findByIdBetween(startId, endId);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<SolarEnergyEntity> getPanelsByTimestampBefore(LocalDateTime timestamp) {
+        return solarEnergyRepository.findByTimestampLessThanEqual(timestamp);
+    }
+
 }
