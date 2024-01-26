@@ -13,14 +13,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -30,28 +28,40 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saria.solarcell.solarcomponents.SolarCellController;
+import com.saria.solarcell.solarcomponents.SolarEnergyCalculatorService;
 import com.saria.solarcell.solarcomponents.SolarEnergyEntity;
 import com.saria.solarcell.solarcomponents.SolarPanelRepository;
+import com.saria.solarcell.solarcomponents.SolarPanelService;
 
-@ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoExtension.class)
+@WebMvcTest(SolarCellController.class)
 class SolarcellApplicationTests {
 
-    private MockMvc mockMvc; 
+	@Autowired
+	private MockMvc mockMvc;
+	
+	private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    private ObjectMapper objectMapper;
-    
-    @Mock
-    private SolarPanelRepository solarPanelRepository;
-    
-    @InjectMocks
-    private SolarCellController solarCellController;
-
-    @BeforeEach
+	@MockBean
+	private SolarPanelService service;
+	
+	@MockBean
+	private SolarEnergyCalculatorService calculatorService;
+	
+	@Mock
+	private SolarCellController solarCellController;
+	
+	@Mock
+	private SolarPanelRepository solarPanelRepository; 
+	
+	
+	
+	@BeforeEach
     public void setup() {
     	// MockMvc standalone approach
     	mockMvc = MockMvcBuilders.standaloneSetup(solarCellController)
                 .build();	
+    	JacksonTester.initFields(this, new ObjectMapper());
     }
     
     private JacksonTester<SolarEnergyEntity> jsonSolarPanel;
