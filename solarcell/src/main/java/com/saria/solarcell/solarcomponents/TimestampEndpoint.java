@@ -21,16 +21,11 @@ public class TimestampEndpoint {
     // GET by Timestamp
     @GetMapping("/time/{timestamp}")
     public ResponseEntity<?> getByTimestamp(@PathVariable LocalDateTime timestamp) {
-        // Your existing logic for getting panels by timestamp
-        // ...
     }
 
     // GET by Timestamp Range
     @GetMapping("/beforeTime/{timestamp}")
     public ResponseEntity<?> getByTimestampRange(@PathVariable LocalDateTime timestamp) {
-        // Your existing logic for getting panels by timestamp range
-        // ...
     }
 
-    // ... (other timestamp-related endpoints)
 }
